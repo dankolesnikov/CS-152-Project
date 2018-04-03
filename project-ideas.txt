@@ -3,3 +3,12 @@ For instance Udash has about 200 stars on github which is very low.
 
 Also any suggestions on a different programming language to other than the ones he listed?
 I was thinking of asking him if we could make something with Play framework..
+
+
+Team members:
+
+* Avi
+* Danil (Dan)
+* Kushal
+
+* ???
