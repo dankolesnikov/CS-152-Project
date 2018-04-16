@@ -7,6 +7,16 @@ Language: Clojure
 Dataset: Flight Data - http://stat-computing.org/dataexpo/2009/the-data.html
 Dataset size: Over 1 million rows per dataset
 
+Metrics we are looking at:
+Average delay Time
+Average Number of bounced flights
+Response to increased load during holiday flights i.e Summer and Winter Break
+Average Delay YOY
+
+Display of data will be done using a javascript graphing library:
+https://d3js.org/
+
+
 We would like to meet with you to narrow down the scope of the project, get your input on the idea. 
 
 Team members:
