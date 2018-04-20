@@ -1,6 +1,7 @@
 (ns project.core)
+(use 'cascalog.api)
+(use 'cascalog.playground)
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn test1
+  ([]     (test1 "Hello world!"))
+  ([msg]  (println msg)))
