@@ -24,35 +24,7 @@ Comments: Making specifications and delegating responsibilities. Much more progr
 Total hours this week:1
 Total hours on project:1
 
-### Danil
-
-* I've researched Clojure programming language and installation guide for the kernel for Jupyter Notebooks. I suggest using it if it works well with the Cascalog framework. It will be easier to collaborate on the code. 
-* Installed Clojure IDE: Nightcode (no feedback yet)
-* Installed Cursive clojure plugin for IntelliJ
-* [Kernel for Notebooks](https://github.com/clojupyter/clojupyter)
-
-Useful Learning Materials:
-
-* [Learn Clojure in Y minutes](https://learnxinyminutes.com/docs/clojure/)
-
-
-**Terminal commands for setting up Clojure Kernel for Jupyter Notebooks(Mac):**
-
-	brew install clojure
-	brew install leiningen
-	git clone https://github.com/clojupyter/clojupyter
-	cd clojupyter
-	make
-	make install
-
-### Avi
-TBU
-
-### Jason
-TBU 
-
-
-## Week 2 Report
+## Week 2 Tasks
 
 To Do:
 
