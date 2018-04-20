@@ -1,4 +1,5 @@
-(ns project.core)
+(ns project.core
+  (:require [clojure.java.io :as io] ))
 (use 'cascalog.api)
 (use 'cascalog.playground) (bootstrap)
 
@@ -8,4 +9,5 @@
 
 (defn -main
   []
-  (test1))
+  (test1)
+  (println (io/resource "airline_delay_causes.csv" )))
