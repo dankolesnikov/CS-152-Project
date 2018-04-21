@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [cascalog/cascalog-core "3.0.0"]
                  [org.apache.hadoop/hadoop-core "1.2.1"]
+                 [org.clojure/data.csv "0.1.4"]
                  ]
   :jvm-opts ["-Xms768m" "-Xmx768m"]
   :main project.core)

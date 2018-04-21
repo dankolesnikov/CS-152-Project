@@ -1,5 +1,6 @@
-(ns project.core
-  (:require [clojure.java.io :as io] ))
+(ns project.core)
+(require '[clojure.data.csv :as csv]
+         '[clojure.java.io :as io])
 (use 'cascalog.api)
 (use 'cascalog.playground) (bootstrap)
 
@@ -7,7 +8,13 @@
   ([]     (test1 "Hello world!"))
   ([msg]  (println msg)))
 
+(with-open [reader (io/reader "in-file.csv")]
+  (doall
+    (csv/read-csv reader)))
+
 (defn -main
   []
   (test1)
-  (println (io/resource "airline_delay_causes.csv" )))
+  (println (io/resource "airline_delay_causes.csv"))
+  (?- (stdout)
+    sentence))
