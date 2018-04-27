@@ -8,10 +8,6 @@
   ([]     (test1 "Hello world!"))
   ([msg]  (println msg)))
 
-(with-open [reader (io/reader "in-file.csv")]
-  (doall
-    (csv/read-csv reader)))
-
 (defn -main
   []
   (test1)
