@@ -14,8 +14,10 @@
   []
   (test1)
   (println (io/resource "airline_delay_causes.csv"))
-  (?- (stdout)sentence)
+  ;(?- (stdout)sentence)
   (def x (str/split(slurp (io/resource "airline_delay_causes.csv")) #","))
   ;x now contains each element of the CSV seperated into a list
-  (println x)
+  ;(println x)
+  (def y (nth x 0))
+  (println y)
   )
