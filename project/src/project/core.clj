@@ -12,5 +12,6 @@
   []
   (test1)
   (println (io/resource "airline_delay_causes.csv"))
-  (?- (stdout)
-    sentence))
+  (?- (stdout)sentence)
+  (println (slurp (io/resource "airline_delay_causes.csv")))
+  )
