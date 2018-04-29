@@ -9,8 +9,10 @@
   ([]     (test1 "Hello world!"))
   ([msg]  (println msg)))
 
+; Returns a list 4th, 7th, 8th element 
 (defn names [x] (list (nth x 3) (nth x 6) (nth x 7)))
 
+;; param: list of lists and calls names on each list
 (defn genNames [x] (if (< (count x) 21) []
                      (do 
                        (def entry (names x))
@@ -19,22 +21,26 @@
                      )  
                      ))
 
-;; High school math
+;; Calculate percentage delay
+;; param: num - number of flights 
+;; param: total - number of delayed flights
+;; divide total by num
 (defn percentage-delay [num total]
   (* (/ total num) 100))
 
 ;; Clojure only provides first and second
-(def fourth #(nth % 3))
-
-(def seventh #(nth % 6))
-
-(def eighth #(nth % 7))
+;; Return nth element ?
+(def fourth #(nth % 3)) ; Carrier
+(def seventh #(nth % 6)) ; Total number of flights
+(def eighth #(nth % 7)) ; total number of delays
 
 ;; Extract the interesting part
+;; Return list of forth, seventh and eigth
 (def extract (juxt fourth seventh eighth))
 
 ;; Parse the data
 (defn parse [airname-data-row]
+;; let -> pass in a list of 3 values
   (let [[date open close] (extract airname-data-row)]
     [date (percentage-delay (Double/parseDouble open)
                              (Double/parseDouble close))]))
