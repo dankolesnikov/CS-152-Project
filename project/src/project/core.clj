@@ -59,10 +59,12 @@
   (def x (str/split(slurp (io/resource "airline_delay_causes.csv")) #","))
   ;x now contains each element of the CSV seperated into a list
   (def y (parse ["2018" "1" "\"9E\"" "\"Endeavor Air Inc.\"" "\"ABY\"" "\"Albany  GA: Southwest Georgia Regional\"" "83.00" "10.00" "3.60" "0.98" "1.51" "0.00" "3.91" "3.00" "0.00" "685.00" "106.00" "240.00" "43.00" "0.00" "296.00"]))
+  (println)
   (println y)
-  (def z (rest(with-open [reader (io/reader (io/resource "airline_delay_causes.csv"))]
-  (doall
-    (csv/read-csv reader)))))
-  (println z)
+  ; (def z (rest(with-open [reader (io/reader (io/resource "airline_delay_causes.csv"))]
+  ; (doall
+  ;   (csv/read-csv reader)))))
+  ;(println z)
+  (println)
   ;(def x1 (max-change (io/resource "airline_delay_causes.csv")))
   )
