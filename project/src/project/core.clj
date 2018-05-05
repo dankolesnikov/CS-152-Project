@@ -9,19 +9,52 @@
 (defn- parse-str [^String s]
   (seq (.split s ",")))
 
+; csv data file
 (def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
 
 (defn flight-parser 
-  "function that parses city,state string into city and state"
+  "parses csv file"
   [line]
   (map #(.trim %) (first (csv/read-csv line))))
-  
-(defn city-state-query 
-  "query that outputs all city and state pairs from cities dataset; repl usage: (city-state-query)"
+
+; not working
+(defn headers
+  "Return headers of csv file; make syntax easier for queries"
   []
-  (?<- (stdout) [?city ?state]
+  ; ([?year ?month ?carrier ?carrier_name ?airport
+  ;                           ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
+  ;                           ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
+  ;                           ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
+  ;                           ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
+  ;                           ?empty])
+)
+  
+(defn delay-by-carrier 
+  "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
+  []
+  (?<- (stdout) [?carrier_name ?arr_delay]
     (flight-data ?line)
-    (flight-parser ?line :> ?city ?state)))
+    ;(flight-parser ?line :> headers)))
+    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
+                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
+                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
+                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
+                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
+                            ?empty)))
+
+; Partially working
+; Need delay-by-carrier to actually return. What is stdout? Need to change that
+; Right now it just executes the job
+(defn write-to-csv
+  "Create a CSV file with the parsed data from delay-by-carrier query"
+  []
+  (with-open [out-file (clojure.java.io/writer "carrier_delay.csv")]
+              (clojure.data.csv/write-csv out-file [
+              ["carrier_name" "arrival_delay"] 
+              ["test" "test"]
+              [(delay-by-carrier)]
+              ]))
+)                            
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -49,13 +82,9 @@
 
 (defn -main
   []
-  (println (say-hello "Jason"))
-  ; (println (airline-data 10))
-  ;test gets path of our csv file resource
-  ;(println print-test)
-  ;(println (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))
-  (println city-state-query)
-  
-  ;test parse-str on single example line of our csv
-  ;(println (parse-str "\"year\",\" month\",\"carrier\",\"carrier_name\",\"airport\",\"airport_name\",\"arr_flights\",\"arr_del15\",\"carrier_ct\",\" weather_ct\",\"nas_ct\",\"security_ct\",\"late_aircraft_ct\",\"arr_cancelled\",\"arr_diverted\",\" arr_delay\",\" carrier_delay\",\"weather_delay\",\"nas_delay\",\"security_delay\",\"late_aircraft_delay\","))
+  (println "Starting...")
+  (delay-by-carrier) ; outputs carriers carriers and delay times
+  (println "Writing CSV...")
+  (write-to-csv) ; creates csv file from parsed data
+  (println "DONE")
   )
