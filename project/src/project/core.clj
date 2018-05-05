@@ -25,16 +25,22 @@
        (:distinct false))
    ))
 
+(def print-test 
+  (let [text-tap (hfs-textline "/Users/danil/Desktop/textfile.txt")]
+  (?<- (stdout) [?textline]
+      (text-tap ?textline)))
+)   
+
 
 (defn -main
   []
   (println (say-hello "Jason"))
-  (println (list (airline-data 10)))
+  (println (airline-data 10))
   ;test gets path of our csv file resource
+  (println print-test)
   (println (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))
   
   
   ;test parse-str on single example line of our csv
   (println (parse-str "\"year\",\" month\",\"carrier\",\"carrier_name\",\"airport\",\"airport_name\",\"arr_flights\",\"arr_del15\",\"carrier_ct\",\" weather_ct\",\"nas_ct\",\"security_ct\",\"late_aircraft_ct\",\"arr_cancelled\",\"arr_diverted\",\" arr_delay\",\" carrier_delay\",\"weather_delay\",\"nas_delay\",\"security_delay\",\"late_aircraft_delay\","))
   )
-  
