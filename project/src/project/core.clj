@@ -17,6 +17,11 @@
   [line]
   (map #(.trim %) (first (csv/read-csv line))))
 
+;Helper function to convert String to Integer     
+(defn String->Number [str]
+  (let [n (read-string str)]
+       (if (number? n) n nil)))
+
 ; not working
 (defn headers
   "Return headers of csv file; make syntax easier for queries"
@@ -28,11 +33,13 @@
   ;                           ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
   ;                           ?empty])
 )
-  
+
+(defn avg_delay [?airline_name ?arr_delay ?arr_del15] (println (float (/ (String->Number ?arr_delay) (String->Number ?arr_del15)))))
+
 (defn delay-by-carrier 
   "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
   []
-  (?<- (stdout) [?carrier_name ?arr_delay]
+  (?<- (stdout) [?carrier_name ?arr_delay ?arr_del15] ;?arr_delay is total delay in minutes ?arr_del15 is total delays over 15 mins per airline
     (flight-data ?line)
     ;(flight-parser ?line :> headers)))
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -41,6 +48,7 @@
                             ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)))
+
 
 ; Partially working
 ; Need delay-by-carrier to actually return. What is stdout? Need to change that
@@ -54,7 +62,8 @@
               ["test" "test"]
               [(delay-by-carrier)]
               ]))
-)                            
+)                       
+
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
