@@ -43,7 +43,7 @@
                             ?empty)))
 
 (def get-names
-  (<- [?carrier_name]
+  (??<- [?carrier_name]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
                             ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
@@ -53,7 +53,7 @@
                             ?empty)))
 
 (def get-years
-  (<- [?year]
+  (??<- [?year]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
                             ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
@@ -61,6 +61,12 @@
                             ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)))
+
+(def years 
+  (distinct get-years))
+
+(def names 
+  (distinct get-names))
 
 ; Partially working
 ; Need delay-by-carrier to actually return. What is stdout? Need to change that
@@ -88,13 +94,11 @@
   (?<- (stdout) [?name]
     (get-names ?name)))
 
-(def years 
-  (list get-years))
 
 (defn -main
   []
   (println "Starting...")
-  (println years)
+  (println (distinct names))
   ;(delay-by-carrier) ; outputs carriers carriers and delay times
   (println "Writing CSV...")
   ;(write-to-csv) ; creates csv file from parsed data
