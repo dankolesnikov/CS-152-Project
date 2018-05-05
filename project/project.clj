@@ -3,16 +3,13 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "https://www.eclipse.org/legal/epl-v10.html"}
+  :repositories {"conjars" "http://conjars.org/repo"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [cascalog/cascalog-core "3.0.0"]
-                 [org.apache.hadoop/hadoop-core "1.2.1"]
-                 [org.clojure/data.csv "0.1.4"]
-                 [org.clojure/clojure "1.2.1"]
-                 [org.clojure/clojure-contrib "1.2.0"]
-                 [org.clojure/data.json "0.1.1"]
-                 [cascalog "1.8.3"]
-                 [cascalog-contrib "1.0.0-SNAPSHOT"]
+                 [cascalog/cascalog-core "2.0.0"] ;; under :dependencies                
+                 [clj-json "0.5.3"]
                  ]
+  :profiles { :provided {:dependencies [[org.apache.hadoop/hadoop-core "1.2.1"]]}
+                         :dependencies [[clojure-csv "1.3.0"]]} 
   :jvm-opts ["-Xms768m" "-Xmx768m"]
   :main project.core)
 
