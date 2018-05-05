@@ -25,8 +25,14 @@
        (:distinct false))
    ))
 
+(def basic-ass-data
+  (let [source (hfs-textline (.getPath(io/resource "Test.txt")))]
+   (<- [?line]
+       (source ?line))
+   ))
+
 (def print-test 
-  (let [text-tap (hfs-textline "/Users/danil/Desktop/textfile.txt")]
+  (let [text-tap (hfs-textline (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))]
   (?<- (stdout) [?textline]
       (text-tap ?textline)))
 )   
@@ -34,10 +40,16 @@
 
 (defn -main
   []
+  (def items (basic-ass-data 2))
+  (println items)
+  ;(let [text-tap (hfs-textline (.getPath(io/resource "Test.txt")))]
+  ;   (?<- (println) [?textline]
+  ;       (text-tap ?textline)))
+  (println (basic-ass-data 2))
   (println (say-hello "Jason"))
   (println (airline-data 10))
   ;test gets path of our csv file resource
-  (println print-test)
+  ;(println print-test)
   (println (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))
   
   
