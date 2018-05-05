@@ -108,6 +108,19 @@
               :quote \-))
 )                       
 
+(defn specific-airline
+  "Outputs data for specific airline"
+  [name]
+  (?<- (stdout) [?carrier_name ?arr_del15]
+    (flight-data ?line)
+    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
+                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
+                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
+                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
+                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
+                            ?empty)
+  (= ?carrier_name name) ;filter predicate
+                            ))
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -125,9 +138,10 @@
 (defn -main
   []
   (println "Starting...")
-  (println (distinct names))
-  (delay-by-carrier) ; outputs carriers carriers and delay times
-  (println "Writing CSV...")
-  (write-to-csv) ; creates csv file from parsed data
+  (specific-airline "JetBlue Airways")
+  ;(println (distinct names))
+  ;(println delay-by-carrier) ; outputs carriers carriers and delay times
+  ;(println "Writing CSV...")
+  ;(write-to-csv) ; creates csv file from parsed data
   (println "DONE")
   )
