@@ -9,6 +9,11 @@
 (defn- parse-str [^String s]
   (seq (.split s ",")))
 
+;Helper function to convert String to Integer     
+(defn String->Number [str]
+  (let [n (read-string str)]
+       (if (number? n) n nil)))
+
 ; csv data file
 (def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
 
@@ -16,6 +21,11 @@
   "parses csv file"
   [line]
   (map #(.trim %) (first (csv/read-csv line))))
+
+;Helper function to convert String to Integer     
+(defn String->Number [str]
+  (let [n (read-string str)]
+       (if (number? n) n nil)))
 
 ; not working
 (defn headers
@@ -28,11 +38,26 @@
   ;                           ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
   ;                           ?empty])
 )
-  
+
+(defn avg_delay [?airline_name ?arr_delay ?arr_del15] (println (float (/ (String->Number ?arr_delay) (String->Number ?arr_del15)))))
+
 (defn delay-by-carrier 
   "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
   []
   (?<- (stdout) [?carrier_name ?year ?arr_flights ?arr_delay]
+    (flight-data ?line)
+    ;(flight-parser ?line :> headers)))
+    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
+                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
+                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
+                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
+                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
+                            ?empty)))
+
+(defn delay-by-carrier-list 
+  "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
+  []
+  (??<- [?carrier_name ?year ?arr_flights ?arr_delay]
     (flight-data ?line)
     ;(flight-parser ?line :> headers)))
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -78,9 +103,11 @@
               (clojure.data.csv/write-csv out-file [
               ["carrier_name" "arrival_delay"] 
               ["test" "test"]
-              [(delay-by-carrier)]
-              ]))
-)                            
+              (delay-by-carrier-list)
+              ]
+              :quote \-))
+)                       
+
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -99,8 +126,8 @@
   []
   (println "Starting...")
   (println (distinct names))
-  ;(delay-by-carrier) ; outputs carriers carriers and delay times
+  (delay-by-carrier) ; outputs carriers carriers and delay times
   (println "Writing CSV...")
-  ;(write-to-csv) ; creates csv file from parsed data
+  (write-to-csv) ; creates csv file from parsed data
   (println "DONE")
   )
