@@ -5,7 +5,8 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :repositories {"conjars" "http://conjars.org/repo"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [cascalog/cascalog-core "2.0.0"] ;; under :dependencies                
+                 [cascalog/cascalog-core "2.0.0"] ;; under :dependencies 
+                 [org.clojure/data.csv "0.1.4"]               
                  [clj-json "0.5.3"]
                  ]
   :profiles { :provided {:dependencies [[org.apache.hadoop/hadoop-core "1.2.1"]]}

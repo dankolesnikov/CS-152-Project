@@ -1,8 +1,8 @@
 (ns project.core)
 (require '[clojure.java.io :as io]
          '[clojure.string :as str]
-         '[clojure-csv [core :as csv]])
-         
+         '[clojure.data.csv :as csv])
+
 (use 'cascalog.api)
 (use 'cascalog.playground) (bootstrap)
 
@@ -14,7 +14,7 @@
 (defn flight-parser 
   "function that parses city,state string into city and state"
   [line]
-  (map #(.trim %) (first (csv/parse-csv line))))
+  (map #(.trim %) (first (csv/read-csv line))))
   
 (defn city-state-query 
   "query that outputs all city and state pairs from cities dataset; repl usage: (city-state-query)"
@@ -54,7 +54,7 @@
   ;test gets path of our csv file resource
   ;(println print-test)
   ;(println (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))
-  ;(println city-state-query)
+  (println city-state-query)
   
   ;test parse-str on single example line of our csv
   ;(println (parse-str "\"year\",\" month\",\"carrier\",\"carrier_name\",\"airport\",\"airport_name\",\"arr_flights\",\"arr_del15\",\"carrier_ct\",\" weather_ct\",\"nas_ct\",\"security_ct\",\"late_aircraft_ct\",\"arr_cancelled\",\"arr_diverted\",\" arr_delay\",\" carrier_delay\",\"weather_delay\",\"nas_delay\",\"security_delay\",\"late_aircraft_delay\","))
