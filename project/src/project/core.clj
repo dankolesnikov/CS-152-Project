@@ -39,8 +39,6 @@
   ;                           ?empty])
 )
 
-(defn avg_delay [?airline_name ?arr_delay ?arr_del15] (println (float (/ (String->Number ?arr_delay) (String->Number ?arr_del15)))))
-
 (defn delay-by-carrier 
   "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
   []
@@ -107,11 +105,12 @@
               ]
               :quote \-))
 )                       
+(defbufferop dosum [tuples] [(reduce + (map first tuples))])
 
-(defn specific-airline
-  "Outputs data for specific airline"
+(defn delay-by-airline
+  "Outputs a vector of airlines and total delay"
   [name]
-  (?<- (stdout) [?carrier_name ?arr_del15]
+  (??<- [?carrier_name ?total_delay]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
                             ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
@@ -120,7 +119,40 @@
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)
   (= ?carrier_name name) ;filter predicate
+  (String->Number ?arr_del15 :> ?arr_del15_num) ; convert arr_del15 string to int from CSV data file
+  (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int
+  (dosum ?arr_del15_num :> ?total_delay) ; sum of all delay times
                             ))
+
+
+(defn flights-by-airline
+  "Outputs a vector of carrier name and total flights number"
+  [name]
+  (??<- [?carrier_name ?total_flights]
+    (flight-data ?line)
+    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
+                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
+                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
+                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
+                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
+                            ?empty)
+  (= ?carrier_name name) ;filter predicate
+  (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
+  (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
+))
+
+(defn toVar
+  [str] str)
+
+(defn average-by-airline 
+  "Outputs an int average value"
+  [name]
+  (?<- (stdout) [?carrier_name ?flights ?delay] 
+  (flights-by-airline name :> ?name ?flights)
+  (delay-by-airline name :> ?carrier_name ?delay)
+  ;(/ ?delay ?flights :> ?average_delay))
+))
+
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -138,7 +170,9 @@
 (defn -main
   []
   (println "Starting...")
-  (specific-airline "JetBlue Airways")
+  ;(delay-by-airline "JetBlue Airways")
+  ;(flights-by-airline "JetBlue Airways")
+  (average-by-airline "JetBlue Airways")
   ;(println (distinct names))
   ;(println delay-by-carrier) ; outputs carriers carriers and delay times
   ;(println "Writing CSV...")
