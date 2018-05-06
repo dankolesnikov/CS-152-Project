@@ -64,6 +64,8 @@
                             ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)
+  (not= ?arr_del15 "")
+  (not= ?arr_flights "")
   (= ?carrier_name name) ;filter predicate
   (String->Number ?arr_del15 :> ?arr_del15_num) ; convert arr_del15 string to int from CSV data file
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int
@@ -82,6 +84,8 @@
                             ?arr_cancelled _ ?arr_delay ?carrier_delay 
                             ?weather_delay _ _ ?late_aircraft_delay 
                             _)
+  (not= ?arr_del15 "")
+  (not= ?arr_flights "")
   (= ?carrier_name name) ;filter predicate
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
@@ -121,19 +125,19 @@
               (Vector->CSV (average-by-airline "Alaska Airlines Inc."))
               (Vector->CSV (average-by-airline "JetBlue Airways"))
               (Vector->CSV (average-by-airline "Delta Air Lines Inc."))
-              ; (Vector->CSV (average-by-airline "ExpressJet Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "Frontier Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "Allegiant Air"))
-              ; (Vector->CSV (average-by-airline "Hawaiian Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "Envoy Air"))
-              ; (Vector->CSV (average-by-airline "Spirit Air Lines"))
-              ; (Vector->CSV (average-by-airline "PSA Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "SkyWest Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "United Air Lines Inc."))
-              ; (Vector->CSV (average-by-airline "Virgin America"))
-              ; (Vector->CSV (average-by-airline "Southwest Airlines Co."))
-              ; (Vector->CSV (average-by-airline "Mesa Airlines Inc."))
-              ; (Vector->CSV (average-by-airline "Republic Airlines"))
+              (Vector->CSV (average-by-airline "ExpressJet Airlines Inc."))
+               (Vector->CSV (average-by-airline "Frontier Airlines Inc."))
+               (Vector->CSV (average-by-airline "Allegiant Air"))
+               (Vector->CSV (average-by-airline "Hawaiian Airlines Inc."))
+               (Vector->CSV (average-by-airline "Envoy Air"))
+               (Vector->CSV (average-by-airline "Spirit Air Lines"))
+               (Vector->CSV (average-by-airline "PSA Airlines Inc."))
+               (Vector->CSV (average-by-airline "SkyWest Airlines Inc."))
+               (Vector->CSV (average-by-airline "United Air Lines Inc."))
+               (Vector->CSV (average-by-airline "Virgin America"))
+               (Vector->CSV (average-by-airline "Southwest Airlines Co."))
+               (Vector->CSV (average-by-airline "Mesa Airlines Inc."))
+               (Vector->CSV (average-by-airline "Republic Airlines"))
               ]
               :quote \-))
 )
