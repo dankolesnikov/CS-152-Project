@@ -90,9 +90,6 @@
 (def years 
   (distinct get-years))
 
-(def names 
-  (distinct get-names))
-
 ; Partially working
 ; Need delay-by-carrier to actually return. What is stdout? Need to change that
 ; Right now it just executes the job
@@ -110,7 +107,7 @@
 (defbufferop dosum [tuples] [(reduce + (map first tuples))])
 
 (defn delay-by-airline
-  "Outputs a vector of airlines and total delay"
+  "Outputs a vector of carrier name and total delay for that airline"
   [name]
   (??<- [?carrier_name ?total_delay]
     (flight-data ?line)
@@ -128,7 +125,7 @@
 
 
 (defn flights-by-airline
-  "Outputs a vector of carrier name and total flights number"
+  "Outputs a vector of carrier name and total flights number for that airline"
   [name]
   (??<- [?carrier_name ?total_flights]
     (flight-data ?line)
@@ -148,48 +145,27 @@
   [str] str)
 
 (defn average-by-airline 
-  "Outputs an int average value"
+  "Outputs a a vector of carrier and and average delay time for that airline"
   [name]
-  (?<- (stdout) [?carrier_name ?average_delay] 
+  (??<- [?carrier_name ?average_delay] 
   ((flights-by-airline name) :> ?carrier_name ?flights)
   ((delay-by-airline name) :> ?carrier_name ?delay)
   (/ ?delay ?flights :> ?average_delay)
   ))
 
+(def names 
+  (distinct get-names))
 
-(defn airline-averages
-  "Outputs an int average value"
-  []
-  (?<- (stdout) []
-  (names ?name)
-  (average-by-airline ?name)
-  ))
-
+(defn airline-delay-averages [] (map average-by-airline names))
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
 
-(def say-hello
- (fn [name]
-   (str "Hello " name)))
-
-(defn print-test 
-  []
-  (?<- (stdout) [?name]
-    (names ?name)))
-
-
 (defn -main
   []
   (println "Starting...")
-  ;(delay-by-airline "JetBlue Airways")
-  ;(flights-by-airline "JetBlue Airways")
-  ;(average-by-airline "JetBlue Airways")
-  (airline-averages)
-  ;(print-test)
-  ;(println (->values [5]))
-  ;(println (distinct names))
-  ;(println delay-by-carrier) ; outputs carriers carriers and delay times
+  ; (println (get (airline-delay-averages) 2))
+  (println (airline-delay-averages))
   ;(println "Writing CSV...")
   ;(write-to-csv) ; creates csv file from parsed data
   (println "DONE")
