@@ -141,17 +141,23 @@
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
 
+(defn airline-averages
+  "Outputs a vectors of airlines and delay averages"
+
+                            )
+
 (defn toVar
   [str] str)
 
 (defn average-by-airline 
   "Outputs an int average value"
   [name]
-  (?<- (stdout) [?carrier_name ?flights ?delay] 
-  (flights-by-airline name :> ?name ?flights)
-  (delay-by-airline name :> ?carrier_name ?delay)
-  ;(/ ?delay ?flights :> ?average_delay))
-))
+  (?<- (stdout) [?carrier_name ?average_delay] 
+  ((flights-by-airline name) :> ?carrier_name ?flights)
+  ((delay-by-airline name) :> ?carrier_name ?delay)
+  (/ ?delay ?flights :> ?average_delay)
+  ))
+
 
 
 (defn- parse-strings [^String name]
