@@ -71,7 +71,6 @@
                             ))
 
 
-<<<<<<< HEAD
 (defn flights-by-airline
   "Outputs a vector of carrier name and total flights number for that airline"
   [name]
@@ -87,19 +86,6 @@
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
-=======
-(def basic-ass-data
-  (let [source (hfs-textline (.getPath(io/resource "Test.txt")))]
-   (<- [?line]
-       (source ?line))
-   ))
-
-(def print-test 
-  (let [text-tap (hfs-textline (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))]
-  (?<- (stdout) [?textline]
-      (text-tap ?textline)))
-)   
->>>>>>> 63238b872f1f1a168bf12b39916e936e6cbcc01a
 
 
 (defn toVar
