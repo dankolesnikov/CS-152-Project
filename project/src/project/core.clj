@@ -71,7 +71,6 @@
                             ))
 
 
-<<<<<<< HEAD
 (defn flights-by-airline
   "Outputs a vector of carrier name and total flights number for that airline"
   [name]
@@ -87,19 +86,6 @@
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
-=======
-(def basic-ass-data
-  (let [source (hfs-textline (.getPath(io/resource "Test.txt")))]
-   (<- [?line]
-       (source ?line))
-   ))
-
-(def print-test 
-  (let [text-tap (hfs-textline (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))]
-  (?<- (stdout) [?textline]
-      (text-tap ?textline)))
-)   
->>>>>>> 63238b872f1f1a168bf12b39916e936e6cbcc01a
 
 
 (defn toVar
@@ -157,27 +143,9 @@
 
 (defn -main
   []
-<<<<<<< HEAD
   (println "Starting...")
   ;(println (airline-delay-averages))
   (println "Writing CSV...")
   (write-to-csv) ; creates csv file from parsed data
   (println "DONE")
-=======
-  (def items (basic-ass-data 2))
-  (println items)
-  ;(let [text-tap (hfs-textline (.getPath(io/resource "Test.txt")))]
-  ;   (?<- (println) [?textline]
-  ;       (text-tap ?textline)))
-  (println (basic-ass-data 2))
-  (println (say-hello "Jason"))
-  (println (airline-data 10))
-  ;test gets path of our csv file resource
-  ;(println print-test)
-  (println (.getPath(io/resource "airline_delay_causes_2012_2017.csv")))
-  
-  
-  ;test parse-str on single example line of our csv
-  (println (parse-str "\"year\",\" month\",\"carrier\",\"carrier_name\",\"airport\",\"airport_name\",\"arr_flights\",\"arr_del15\",\"carrier_ct\",\" weather_ct\",\"nas_ct\",\"security_ct\",\"late_aircraft_ct\",\"arr_cancelled\",\"arr_diverted\",\" arr_delay\",\" carrier_delay\",\"weather_delay\",\"nas_delay\",\"security_delay\",\"late_aircraft_delay\","))
->>>>>>> 63238b872f1f1a168bf12b39916e936e6cbcc01a
   )
