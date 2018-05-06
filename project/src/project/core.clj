@@ -14,6 +14,8 @@
   (let [n (read-string str)]
        (if (number? n) n nil)))
 
+(defmapfn ->values [val] val)
+
 ; csv data file
 (def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
 
@@ -130,21 +132,17 @@
   [name]
   (??<- [?carrier_name ?total_flights]
     (flight-data ?line)
-    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
-                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
-                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
-                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
-                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
-                            ?empty)
+    (flight-parser ?line :> ?year _ _ ?carrier_name ?airport
+                            _ ?arr_flights ?arr_del15 _ 
+                            _ _ _ ?late_aircraft_ct 
+                            ?arr_cancelled _ ?arr_delay ?carrier_delay 
+                            ?weather_delay _ _ ?late_aircraft_delay 
+                            _)
   (= ?carrier_name name) ;filter predicate
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
 
-(defn airline-averages
-  "Outputs a vectors of airlines and delay averages"
-
-                            )
 
 (defn toVar
   [str] str)
@@ -159,6 +157,14 @@
   ))
 
 
+(defn airline-averages
+  "Outputs an int average value"
+  []
+  (?<- (stdout) []
+  (names ?name)
+  (average-by-airline ?name)
+  ))
+
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -170,7 +176,7 @@
 (defn print-test 
   []
   (?<- (stdout) [?name]
-    (get-names ?name)))
+    (names ?name)))
 
 
 (defn -main
@@ -178,7 +184,10 @@
   (println "Starting...")
   ;(delay-by-airline "JetBlue Airways")
   ;(flights-by-airline "JetBlue Airways")
-  (average-by-airline "JetBlue Airways")
+  ;(average-by-airline "JetBlue Airways")
+  (airline-averages)
+  ;(print-test)
+  ;(println (->values [5]))
   ;(println (distinct names))
   ;(println delay-by-carrier) ; outputs carriers carriers and delay times
   ;(println "Writing CSV...")
