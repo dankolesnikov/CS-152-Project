@@ -9,11 +9,6 @@
 (defn- parse-str [^String s]
   (seq (.split s ",")))
 
-;Helper function to convert String to Integer     
-(defn String->Number [str]
-  (let [n (read-string str)]
-       (if (number? n) n nil)))
-
 (defmapfn ->values [val] val)
 
 ; csv data file
@@ -24,50 +19,13 @@
   [line]
   (map #(.trim %) (first (csv/read-csv line))))
 
-;Helper function to convert String to Integer     
 (defn String->Number [str]
+  "convert string to intereger"
   (let [n (read-string str)]
        (if (number? n) n nil)))
 
-; not working
-(defn headers
-  "Return headers of csv file; make syntax easier for queries"
-  []
-  ; ([?year ?month ?carrier ?carrier_name ?airport
-  ;                           ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
-  ;                           ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
-  ;                           ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
-  ;                           ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
-  ;                           ?empty])
-)
-
-(defn delay-by-carrier 
-  "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
-  []
-  (?<- (stdout) [?carrier_name ?year ?arr_flights ?arr_delay]
-    (flight-data ?line)
-    ;(flight-parser ?line :> headers)))
-    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
-                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
-                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
-                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
-                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
-                            ?empty)))
-
-(defn delay-by-carrier-list 
-  "Query outputs all carrier names with corresponding arrival delay time repl usage: (delay-by-carrier)"
-  []
-  (??<- [?carrier_name ?year ?arr_flights ?arr_delay]
-    (flight-data ?line)
-    ;(flight-parser ?line :> headers)))
-    (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
-                            ?airport_name ?arr_flights ?arr_del15 ?carrier_ct 
-                            ?weather_ct ?nas_ct ?security_ct ?late_aircraft_ct 
-                            ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
-                            ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
-                            ?empty)))
-
 (def get-names
+  "Return a vector of all carrier_names in the csv file"
   (??<- [?carrier_name]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -78,6 +36,7 @@
                             ?empty)))
 
 (def get-years
+  "Return a vector of all years in the csv file"
   (??<- [?year]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -88,22 +47,10 @@
                             ?empty)))
 
 (def years 
+  "return distinct years"
   (distinct get-years))
 
-; Partially working
-; Need delay-by-carrier to actually return. What is stdout? Need to change that
-; Right now it just executes the job
-(defn write-to-csv
-  "Create a CSV file with the parsed data from delay-by-carrier query"
-  []
-  (with-open [out-file (clojure.java.io/writer "carrier_delay.csv")]
-              (clojure.data.csv/write-csv out-file [
-              ["carrier_name" "arrival_delay"] 
-              ["test" "test"]
-              (delay-by-carrier-list)
-              ]
-              :quote \-))
-)                       
+; sum the vectors                       
 (defbufferop dosum [tuples] [(reduce + (map first tuples))])
 
 (defn delay-by-airline
@@ -156,7 +103,40 @@
 (def names 
   (distinct get-names))
 
-(defn airline-delay-averages [] (map average-by-airline names))
+; Returns a vector of vectors [carrier_name average_delay]
+; my laptop is not able to handle this computation
+(defn airline-delay-averages [] [(map average-by-airline names)])
+
+; Format vector to make it work with CSV library
+(defn Vector->CSV [vec] (nth vec 0))      
+
+(defn write-to-csv
+  "Create a CSV file with the parsed data from delay-by-carrier query"
+  []
+  (with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
+              (clojure.data.csv/write-csv out-file [
+              ["carrier_name" "average_delay"] 
+              (Vector->CSV (average-by-airline "Endeavor Air Inc."))
+              (Vector->CSV (average-by-airline "American Airlines Inc."))
+              (Vector->CSV (average-by-airline "Alaska Airlines Inc."))
+              (Vector->CSV (average-by-airline "JetBlue Airways"))
+              (Vector->CSV (average-by-airline "Delta Air Lines Inc."))
+              ; (Vector->CSV (average-by-airline "ExpressJet Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "Frontier Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "Allegiant Air"))
+              ; (Vector->CSV (average-by-airline "Hawaiian Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "Envoy Air"))
+              ; (Vector->CSV (average-by-airline "Spirit Air Lines"))
+              ; (Vector->CSV (average-by-airline "PSA Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "SkyWest Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "United Air Lines Inc."))
+              ; (Vector->CSV (average-by-airline "Virgin America"))
+              ; (Vector->CSV (average-by-airline "Southwest Airlines Co."))
+              ; (Vector->CSV (average-by-airline "Mesa Airlines Inc."))
+              ; (Vector->CSV (average-by-airline "Republic Airlines"))
+              ]
+              :quote \-))
+)
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
@@ -164,9 +144,8 @@
 (defn -main
   []
   (println "Starting...")
-  ; (println (get (airline-delay-averages) 2))
-  (println (airline-delay-averages))
-  ;(println "Writing CSV...")
-  ;(write-to-csv) ; creates csv file from parsed data
+  ;(println (airline-delay-averages))
+  (println "Writing CSV...")
+  (write-to-csv) ; creates csv file from parsed data
   (println "DONE")
   )
