@@ -10,8 +10,14 @@
                  [clj-json "0.5.3"]
                  ]
 <<<<<<< HEAD
+<<<<<<< HEAD
   :profiles { :provided {:dependencies [[org.apache.hadoop/hadoop-core "1.2.1"]]}
                          :dependencies [[clojure-csv "1.3.0"]]} 
+=======
+  :dev-dependencies [
+                     [org.apache.hadoop/hadoop-core "0.20.2-dev"]
+                     [swank-clojure "1.2.1"]]
+>>>>>>> 63238b872f1f1a168bf12b39916e936e6cbcc01a
 =======
   :dev-dependencies [
                      [org.apache.hadoop/hadoop-core "0.20.2-dev"]
