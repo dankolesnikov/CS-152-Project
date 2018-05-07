@@ -8,7 +8,7 @@
 (use 'cascalog.playground) (bootstrap)
 
 ; csv data file
-(def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
+(def flight-data (hfs-textline "resources/airline_delay_causes_2012_2017.csv"))
 
 (defn flight-parser 
   "parses csv file"
@@ -122,14 +122,14 @@
 (defn write
   "Outputs a CSV file for average delay time of all airline in the specific year"
   [year]
-  (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delay" year ".csv"))]
+  (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delays_" year ".csv"))]
               (clojure.data.csv/write-csv out-file (airline-delay-averages year)
               :quote \-))
   )
 
 (defn write-all
   []
-  ;(doall (map write [years]))
+  (dorun (map #(write %) (apply list (get-years-distinct))))
   )
 
 
@@ -169,7 +169,8 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write "2018")
+  (write-all)
+  ;(write "2018")
   (println "DONE!")
   )
 
