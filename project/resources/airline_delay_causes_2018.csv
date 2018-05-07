@@ -1,4 +1,3 @@
-"year"," month","carrier","carrier_name","airport","airport_name","arr_flights","arr_del15","carrier_ct"," weather_ct","nas_ct","security_ct","late_aircraft_ct","arr_cancelled","arr_diverted"," arr_delay"," carrier_delay","weather_delay","nas_delay","security_delay","late_aircraft_delay",
 2018,1,"9E","Endeavor Air Inc.","ABY","Albany, GA: Southwest Georgia Regional",83.00,10.00,3.60,0.98,1.51,0.00,3.91,3.00,0.00,685.00,106.00,240.00,43.00,0.00,296.00,
 2018,1,"9E","Endeavor Air Inc.","AEX","Alexandria, LA: Alexandria International",99.00,13.00,7.37,0.86,0.44,0.00,4.33,3.00,0.00,910.00,455.00,151.00,46.00,0.00,258.00,
 2018,1,"9E","Endeavor Air Inc.","AGS","Augusta, GA: Augusta Regional at Bush Field",1.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,

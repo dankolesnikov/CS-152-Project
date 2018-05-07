@@ -114,11 +114,11 @@
   ))
 
 (def names 
-  (distinct get-names))
+  (distinct (get-names "2018")))
 
 ; Returns a vector of vectors [carrier_name average_delay]
 ; my laptop is not able to handle this computation
-(defn airline-delay-averages [year] [(map average-by-airline names years)])
+(defn airline-delay-averages [year] (map average-by-airline (get-names-distinct year) (repeat year)))
 
 ; Format vector to make it work with CSV library
 (defn Vector->CSV [vec] (nth vec 0))      
@@ -126,8 +126,10 @@
 
 (defn gen-vectors
   [year]
-  [(Vector->CSV (average-by-airline "SkyWest Airlines Inc." year))
-   (Vector->CSV (average-by-airline "SkyWest Airlines Inc." year))]
+  (??<-[?lst]
+  (names ?carrier_name)
+  ((average-by-airline ?carrier_name year) :. ?lst)
+  )
   )
 
 
@@ -171,6 +173,10 @@
   ;(with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
   ;            (clojure.data.csv/write-csv out-file (gen-vectors allnames "2017")
   ;            :quote \-))
-  (write-to-csv "2018") ; creates csv file from parsed data
+  ;(println "Endeavor Air Inc.")
+  (println (airline-delay-averages "2018"))
+  ;(println (gen-vectors "2018"))
+  ;(println (gen-vectors "2018"))
+  ;(write-to-csv "2018") ; creates csv file from parsed data
   (println "DONE")
   )
