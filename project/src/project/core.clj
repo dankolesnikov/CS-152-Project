@@ -117,7 +117,7 @@
 (defn Vector->CSV [vec] (nth vec 0))
 
 ; Convert vector to string
-(defn Vector->String [vec] (str vec))      
+(defn Vector->String [vec] (nth vec 0))      
 
 ; Returns a vector of vectors [carrier_name average_delay]
 (defn airline-delay-averages [year] (map Vector->CSV (map average-by-airline (get-names-distinct year) (repeat year))) )
@@ -132,7 +132,7 @@
 
 (defn write-all
   []
-  (dorun (map #(write %) (apply list (get-years-distinct))))
+  (dorun (map #(write %) (get-years-distinct)))
   )
 
 
@@ -172,7 +172,8 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write-all)
+  ;(println (get-years-distinct))
+  (write ["2016"])
   (println "DONE!")
   )
 
