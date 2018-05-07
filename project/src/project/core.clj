@@ -172,8 +172,7 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  ;(println (get-years-distinct))
-  (write ["2016"])
+  (write-all)
   (println "DONE!")
   )
 
