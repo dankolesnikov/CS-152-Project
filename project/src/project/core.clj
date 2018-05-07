@@ -1,4 +1,5 @@
-(ns project.core (:gen-class))
+(ns project.core
+  (:gen-class))
 (require '[clojure.java.io :as io]
          '[clojure.string :as str]
          '[clojure.data.csv :as csv])
@@ -42,8 +43,9 @@
   (distinct (get-names year))
 )
 
-(def get-years
+(defn get-years
   "Return a vector of all years in the csv file"
+  []
   (??<- [?year]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -52,6 +54,12 @@
                             ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)))
+
+(defn get-years-distinct 
+  []
+  (distinct (get-years))
+)
+
 
 (def years 
   "return distinct years"
@@ -113,23 +121,25 @@
   (/ ?delay ?flights :> ?average_delay)
   ))
 
-(def names 
-  (distinct (get-names "2018")))
-
-; Returns a vector of vectors [carrier_name average_delay]
-; my laptop is not able to handle this computation
-(defn airline-delay-averages [year] (map average-by-airline (get-names-distinct year) (repeat year)))
 
 ; Format vector to make it work with CSV library
 (defn Vector->CSV [vec] (nth vec 0))      
-   
 
-(defn gen-vectors
+; Returns a vector of vectors [carrier_name average_delay]
+; my laptop is not able to handle this computation
+(defn airline-delay-averages [year] (map Vector->CSV (map average-by-airline (get-names-distinct year) (repeat year))) )
+
+
+(defn write
   [year]
-  (??<-[?lst]
-  (names ?carrier_name)
-  ((average-by-airline ?carrier_name year) :. ?lst)
+  (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delay" year ".csv"))]
+              (clojure.data.csv/write-csv out-file (airline-delay-averages year)
+              :quote \-))
   )
+
+(defn write-all
+  []
+  ;(doall (map write [years]))
   )
 
 
@@ -174,9 +184,15 @@
   ;            (clojure.data.csv/write-csv out-file (gen-vectors allnames "2017")
   ;            :quote \-))
   ;(println "Endeavor Air Inc.")
-  (println (airline-delay-averages "2018"))
+  ;(write-all)
+  (write "2018")
+  ;(println (get-years-distinct))
+  ;(with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
+  ;            (clojure.data.csv/write-csv out-file (airline-delay-averages "2018")
+  ;            :quote \-))
   ;(println (gen-vectors "2018"))
   ;(println (gen-vectors "2018"))
   ;(write-to-csv "2018") ; creates csv file from parsed data
   (println "DONE")
   )
+
