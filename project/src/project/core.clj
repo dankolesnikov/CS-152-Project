@@ -115,6 +115,8 @@
 
 ; Format vector to make it work with CSV library
 (defn Vector->CSV [vec] (nth vec 0))
+
+; Convert vector to string
 (defn Vector->String [vec] (str vec))      
 
 ; Returns a vector of vectors [carrier_name average_delay]
@@ -170,8 +172,7 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  ;(write-all)
-  (write "2018")
+  (write-all)
   (println "DONE!")
   )
 
