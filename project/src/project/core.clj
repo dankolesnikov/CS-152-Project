@@ -114,7 +114,8 @@
   ))
 
 ; Format vector to make it work with CSV library
-(defn Vector->CSV [vec] (nth vec 0))      
+(defn Vector->CSV [vec] (nth vec 0))
+(defn Vector->String [vec] (str vec))      
 
 ; Returns a vector of vectors [carrier_name average_delay]
 (defn airline-delay-averages [year] (map Vector->CSV (map average-by-airline (get-names-distinct year) (repeat year))) )
@@ -122,7 +123,7 @@
 (defn write
   "Outputs a CSV file for average delay time of all airline in the specific year"
   [year]
-  (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delays_" year ".csv"))]
+  (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delays_" (Vector->String year) ".csv"))]
               (clojure.data.csv/write-csv out-file (airline-delay-averages year)
               :quote \-))
   )
@@ -169,8 +170,8 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write-all)
-  ;(write "2018")
+  ;(write-all)
+  (write "2018")
   (println "DONE!")
   )
 
