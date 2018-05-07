@@ -1,16 +1,11 @@
 (ns project.core
-  (:gen-class))
+  (:gen-class)) ; needs to be here to work with hadoop
 (require '[clojure.java.io :as io]
          '[clojure.string :as str]
          '[clojure.data.csv :as csv])
 
 (use 'cascalog.api)
 (use 'cascalog.playground) (bootstrap)
-
-(defn- parse-str [^String s]
-  (seq (.split s ",")))
-
-(defmapfn ->values [val] val)
 
 ; csv data file
 (def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
@@ -79,10 +74,10 @@
                             ?arr_cancelled ?arr_diverted ?arr_delay ?carrier_delay 
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)
-  (not= ?arr_del15 "")
-  (not= ?arr_flights "")
-  (= year ?year)
-  (= ?carrier_name name) ;filter predicate
+  (not= ?arr_del15 "") ; validation
+  (not= ?arr_flights "") ; validation
+  (= year ?year) ; filter by year
+  (= ?carrier_name name) ;filter by name
   (String->Number ?arr_del15 :> ?arr_del15_num) ; convert arr_del15 string to int from CSV data file
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int
   (dosum ?arr_del15_num :> ?total_delay) ; sum of all delay times
@@ -100,17 +95,14 @@
                             ?arr_cancelled _ ?arr_delay ?carrier_delay 
                             ?weather_delay _ _ ?late_aircraft_delay 
                             _)
-  (not= ?arr_del15 "")
-  (not= ?arr_flights "")
-  (= year ?year)
-  (= ?carrier_name name) ;filter predicate
+  (not= ?arr_del15 "") ; validation
+  (not= ?arr_flights "") ; validation
+  (= year ?year) ; filter by year 
+  (= ?carrier_name name) ;filter by carrier name
   (String->Number ?arr_flights :> ?arr_flights_num) ; convert arr_flights string to int from CSV data file
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
 
-
-(defn toVar
-  [str] str)
 
 (defn average-by-airline 
   "Outputs a a vector of carrier and and average delay time for that airline"
@@ -118,19 +110,17 @@
   (??<- [?carrier_name ?average_delay] 
   ((flights-by-airline name year) :> ?carrier_name ?flights)
   ((delay-by-airline name year) :> ?carrier_name ?delay)
-  (/ ?delay ?flights :> ?average_delay)
+  (/ ?delay ?flights :> ?average_delay) ; compute the average delay 
   ))
-
 
 ; Format vector to make it work with CSV library
 (defn Vector->CSV [vec] (nth vec 0))      
 
 ; Returns a vector of vectors [carrier_name average_delay]
-; my laptop is not able to handle this computation
 (defn airline-delay-averages [year] (map Vector->CSV (map average-by-airline (get-names-distinct year) (repeat year))) )
 
-
 (defn write
+  "Outputs a CSV file for average delay time of all airline in the specific year"
   [year]
   (with-open [out-file (clojure.java.io/writer (str "csv_output/average_delay" year ".csv"))]
               (clojure.data.csv/write-csv out-file (airline-delay-averages year)
@@ -143,56 +133,43 @@
   )
 
 
-
-(defn write-to-csv
-  "Create a CSV file with the parsed data from delay-by-carrier query"
-  [year]
-  (with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
-              (clojure.data.csv/write-csv out-file [
-              ["carrier_name" "average_delay"]
-              (Vector->CSV (average-by-airline "Endeavor Air Inc." year))
-              (Vector->CSV (average-by-airline "American Airlines Inc." year))
-              (Vector->CSV (average-by-airline "Alaska Airlines Inc." year))
-              (Vector->CSV (average-by-airline "JetBlue Airways" year))
-              (Vector->CSV (average-by-airline "Delta Air Lines Inc." year))
-              (Vector->CSV (average-by-airline "ExpressJet Airlines Inc." year))
-              (Vector->CSV (average-by-airline "Frontier Airlines Inc." year))
-              (Vector->CSV (average-by-airline "Allegiant Air" year))
-              (Vector->CSV (average-by-airline "Hawaiian Airlines Inc." year))
-              (Vector->CSV (average-by-airline "Envoy Air" year))
-              (Vector->CSV (average-by-airline "Spirit Air Lines" year))
-              (Vector->CSV (average-by-airline "PSA Airlines Inc." year))
-              (Vector->CSV (average-by-airline "SkyWest Airlines Inc." year))
-              (Vector->CSV (average-by-airline "United Air Lines Inc." year))
-              (Vector->CSV (average-by-airline "Virgin America" year))
-              (Vector->CSV (average-by-airline "Southwest Airlines Co." year))
-              (Vector->CSV (average-by-airline "Mesa Airlines Inc." year))
-              (Vector->CSV (average-by-airline "Republic Airlines" year))
-              ]
-              :quote \-))
-)
+; For legacy
+; (defn write-to-csv
+;   "Create a CSV file with the parsed data from delay-by-carrier query"
+;   [year]
+;   (with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
+;               (clojure.data.csv/write-csv out-file [
+;               ["carrier_name" "average_delay"]
+;               (Vector->CSV (average-by-airline "Endeavor Air Inc." year))
+;               (Vector->CSV (average-by-airline "American Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "Alaska Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "JetBlue Airways" year))
+;               (Vector->CSV (average-by-airline "Delta Air Lines Inc." year))
+;               (Vector->CSV (average-by-airline "ExpressJet Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "Frontier Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "Allegiant Air" year))
+;               (Vector->CSV (average-by-airline "Hawaiian Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "Envoy Air" year))
+;               (Vector->CSV (average-by-airline "Spirit Air Lines" year))
+;               (Vector->CSV (average-by-airline "PSA Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "SkyWest Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "United Air Lines Inc." year))
+;               (Vector->CSV (average-by-airline "Virgin America" year))
+;               (Vector->CSV (average-by-airline "Southwest Airlines Co." year))
+;               (Vector->CSV (average-by-airline "Mesa Airlines Inc." year))
+;               (Vector->CSV (average-by-airline "Republic Airlines" year))
+;               ]
+;               :quote \-))
+; )
 
 (defn- parse-strings [^String name]
   (hfs-textline name))
 
 (defn -main
   []
-  (println "Starting...")
-  ;(println (airline-delay-averages))
-  (println "Writing CSV...")
-  ;(with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
-  ;            (clojure.data.csv/write-csv out-file (gen-vectors allnames "2017")
-  ;            :quote \-))
-  ;(println "Endeavor Air Inc.")
-  ;(write-all)
+  (println "Starting ...")
+  (println "Writing CSV ...")
   (write "2018")
-  ;(println (get-years-distinct))
-  ;(with-open [out-file (clojure.java.io/writer "csv_output/average_delay.csv")]
-  ;            (clojure.data.csv/write-csv out-file (airline-delay-averages "2018")
-  ;            :quote \-))
-  ;(println (gen-vectors "2018"))
-  ;(println (gen-vectors "2018"))
-  ;(write-to-csv "2018") ; creates csv file from parsed data
-  (println "DONE")
+  (println "DONE!")
   )
 
