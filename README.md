@@ -2,18 +2,6 @@
 
 > Group project for Programming Paradigms class with Professor Cay Horstmann.
 
-
-## Build 
-Linux: 
-
-```
-chmod +x build.sh
-./build.sh
-```
- 
- Viola!
-
-
 ## Overview
 
 ### Project Goals
