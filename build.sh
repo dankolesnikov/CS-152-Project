@@ -1,4 +1,9 @@
 #/bin/bash
+# Linux only
+# Clones repo
+# Installs leiningen
+# Creates Hadoop jar file
+
 
 echo "CS 152 Cascalog Project"
 echo "Starting to build..."
@@ -11,5 +16,17 @@ cd "CS-152-Project"
 # less "project-proposal.txt"
 echo "Installing Leiningen - build tool for Clojrue projects."
 
+# This doesn't get the latest version" sudo apt-get install clojure
+# Below is the preffered way to install lein
+cp leiningen-build-script.sh /usr/local/bin
+sudo chmod +x /usr/local/bin/lein/leiningen-build-script
+lein -version
+
+echo "Creating a Hadoop JAR"
+lein uberjar
+echo "Uploading JAR to Google Cloud"
+echo "Downloading CSV files from Google Cloud"
+echo "CSV files generated from Google Cloud Hadoop cluster reside in hadoop_output folder"
 
 echo "Opening Slides..."
+xdg-open "slides/reveal.js-3.6.0/index.html"
