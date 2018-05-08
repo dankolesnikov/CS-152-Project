@@ -9,7 +9,7 @@
 
 ; csv data file
 ;(def flight-data (hfs-textline "https://storage.googleapis.com/cs152project/airline_delay_causes_2012_2017.csv"))
-(def flight-data (hfs-textline "resources/airline_delay_causes_2018.csv"))
+(def flight-data (hfs-textline "resources/airline_delay_causes_2012_2017.csv"))
 (defn flight-parser 
   "parses csv file"
   [line]
@@ -122,10 +122,10 @@
 (defn write
   "Outputs a CSV file for average delay time of all airline in the specific year"
   [year]
-  (with-open [out-file (clojure.java.io/writer (str "csv_output/percentage_delayed_flights_" (str year) ".csv"))]
+  (with-open [out-file (clojure.java.io/writer (str "csv_output/percentage_delayed_flights_" (Vector->String year) ".csv"))]
               (clojure.data.csv/write-csv out-file 
-              ;["Carrier" "Percentage of Delayed Flights"]
-              (airline-delay-percentages year)
+              (cons ["Carrier" "Percentage of Delayed Flights"]
+              (airline-delay-percentages year))
               :quote \-))
   )
 
@@ -141,7 +141,7 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write "2018")
+  (write-all)
   ; (write-all)
   (println "DONE!")
   )
