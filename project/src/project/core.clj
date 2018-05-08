@@ -8,7 +8,7 @@
 (use 'cascalog.playground) (bootstrap)
 
 ; csv data file
-(def flight-data (hfs-textline "resources/airline_delay_causes_2012_2017.csv"))
+(def flight-data (hfs-textline "https://storage.googleapis.com/cs152project/airline_delay_causes_2012_2017.csv"))
 
 (defn flight-parser 
   "parses csv file"
