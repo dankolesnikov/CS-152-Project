@@ -1,9 +1,11 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6b26fb07cc26a1f3c67cd3a2aa41482e28075bfe
 /classes
 /checkouts
 pom.xml
 pom.xml.asc
-*.jar
 *.class
 /.lein-*
 /.nrepl-port
