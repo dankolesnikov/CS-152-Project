@@ -4,7 +4,7 @@ Idea: Compare 4 datasets of flight data over 4 years. Analyze the data by findin
 
 Framework: Cascalog
 Language: Clojure
-Dataset: Flight Data - http://stat-computing.org/dataexpo/2009/the-data.html
+Dataset: Flight Data - https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp
 Dataset size: Over 1 million rows per dataset
 
 Metrics we are looking at:
