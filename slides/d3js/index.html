@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Life Expectancy : 1960 &mdash; 2011</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script src="http://mbostock.github.com/d3/d3.v2.min.js?2.8.1"></script>
+  <style>
+    /* Styling for the page */
+    body { font: normal 10px Helvetica, sans-serif; margin: 2em; }
+    /* Styling for the chart */
+    #chart { position: relative; padding-top: 2.5em; }
+    select#select_country { position: absolute; top: 0; left: 30px; }
+    line.rule { stroke: #eee; stroke-width: 1; shape-rendering: crispEdges; }
+    text.tick { fill: #ccc; text-anchor: end; }
+    rect.bar { stroke: white; border-width: 1px; fill: #7BC8FB; }
+    rect.bar.missing { fill: #ccc; }
+    text.label { fill: white; text-anchor: middle; }
+    text.label.missing { font-size: 8px; }
+    text.legend { fill: #7BC8FB; text-anchor: middle; rotate: 45; }
+    .over rect.bar { fill: black; }
+    .over text.legend { fill: black; }
+    .mean path { stroke: #000; stroke-dasharray: 2,2; stroke-width: 1px; fill: none; }
+  </style>
+</head>
+<body>
+  <div id="chart"></div>
+</body>
+
+<script>
+  var BarChart = function(url) {
+        // Configuration
+        //
+    var config = {
+          width:  900 - 20,
+          height: 100,
+          margin: 20
+        },
+
+        // Chart
+        //
+        chart = d3.select("#chart").append("svg")
+                   .attr("width",  config.width)
+                   // Make room for the bottom labels
+                   .attr("height", config.height + config.margin*2)
+                  .append("g")
+                   // Make room for left-side tick labels and top rule line
+                   .attr("transform", "translate(" + 10 + "," + 10 + ")"),
+
+        // Country select
+        //
+        select = d3.select("#chart")
+          .append("select")
+          .attr("id", "select_country")
+          .attr("accesskey", "c")
+          .on("change", function(e) { return __draw(this.value); }),
+
+        // CSV data
+        //
+        csv  = null,
+
+        // Display the chart for a specific country (load data if missing)
+        //
+        display = function(country) {
+          if ( ! csv ) {
+            return __load(url, function() { return __draw(country); })
+          } else {
+            return __draw(country);
+          }
+        },
+
+        // Convert a String to DOM ID friendly format
+        //
+        __parameterize = function(s) {
+          return s.toLowerCase().replace(/[^a-z]/g, "-")
+        },
+
+        // Load the CSV data from external source
+        //
+        __load = function(url, callback) {
+          d3.csv(url, function(data) {
+            // Assign data from CSV
+            csv = data;
+
+            // Select
+            var countries = select
+              .selectAll("option")
+              .data( csv.map( function(d) { return d["Country Name"]; } ) )
+              .enter()
+               .append("option")
+               .attr("value", function(d) { return d; })
+               .attr("id",    function(d) { return "option-"+__parameterize(d); })
+               .text(function(d) { return d; });
+
+            // Perform the callback
+            callback();
+          });
+        },
+
+        // Draw the chart
+        //
+        __draw = function(country) {
+          // console.log("CSV:",  csv);
+
+                       // Select a specific country
+          var data   = csv.filter( function(d) { return d["Country Name"] == country; } ),
+
+                       // Filter out keys (years)
+              legend = d3.keys(data[0])
+                         .filter( function(d) { return d.match(/^\d/); } ),
+
+                       // Filter out values and convert them to numbers
+              values = d3.entries(data[0])
+                         .filter( function(d) { return d.key.match(/^\d/); } )
+                         .map( function(d) { return d.value; } )
+                         .map( function(d) { return parseFloat(d) || null; } );
+
+          console.debug("Legend:", legend);
+          console.debug("Values:", values);
+
+          // Select selected country
+          d3.selectAll("#select_country option").attr("selected", null);
+          d3.select("#option-"+__parameterize(country)).attr("selected", true);
+
+          // 1) Scales
+          var x = d3.scale.ordinal()
+                    .domain( values.map(function(d,i) { return i; }) )
+                    .rangeRoundBands([0, config.width], 0.1);
+
+          var y = d3.scale.linear()
+                    .domain([0, 100])
+                    .range([0, config.height]);
+
+          // 2) Ticks
+          var tick = chart.selectAll("g.tick").data(y.ticks(5))
+                       .enter()
+                      .append("g")
+                       .attr("class", "tick");
+
+          tick
+           .append("line")
+            .classed("rule", true)
+            .attr("x1", 22)
+            .attr("x2", config.width)
+            .attr("y1", y)
+            .attr("y2", y);
+
+          tick
+           .append("text")
+            .classed("tick", true)
+            .attr("x", 18)
+            .attr("y", function(d) { return config.height - y(d); })
+            .attr("dy", 3)
+            .text(function(d) { return (d) ? d : null; });
+
+          // 3) Bars
+          var bar = chart.selectAll("g.bar").data(values);
+
+          var group = bar.enter()
+                        .append("g")
+                        .attr("class", "bar")
+          group
+            .append("rect")
+             .classed("bar", true)
+             .attr("height", 0)
+             .attr("y",      config.height);
+          group
+            .append("text")
+             .classed("label", true);
+          group
+            .append("text")
+             .classed("legend", true)
+
+          bar
+           .exit()
+            .remove();
+
+          bar
+           .select("rect.bar")
+            .classed("missing", function(d,i) { return !d; })
+            .attr("width",  x.rangeBand())
+            .attr("x",      function(d,i) { return x(i); })
+           .transition()
+             .duration(500)
+            .attr("height", function(d,i) { return y(d) || 15; })
+            .attr("y",      function(d,i) { return d ? config.height - y(d) : config.height - 15; })
+
+          bar
+            .on("mouseover", function(d,i) { return d3.select(this).classed("over", true);  })
+            .on("mouseout",  function(d,i) { return d3.select(this).classed("over", false); });
+
+          // 4) Labels (values)
+          bar
+           .select("text.label")
+            .classed("missing", function(d,i) { return !d; })
+            .attr("x",      function(d,i) { return x(i) + Math.round(x.rangeBand()/2); })
+            .attr("y",      config.height - 5)
+            .text(          function(d,i) { return d ? Math.round(d) : "n/a" ; });
+
+          // 5) Legend (years)
+          bar
+           .select("text.legend")
+            .data(legend)
+            .classed("legend", true)
+            .attr("x",      function(d,i) { return x(i) + Math.round(x.rangeBand()/2); })
+            .attr("y",      config.height + 10)
+            .attr("transform", function(d,i) { return "rotate(45 " + x(i) + ", " + (config.height + 15) + ")"; })
+            .text(function(d,i) { return d; });
+
+
+          // Display the "mean" line across the whole dataset
+          //
+          if ( d3.select(".mean") < 1 ) {
+            var means = csv
+              .reduce(function(previous, current, index) {
+                // 1) Extract years
+                //
+                var years = d3.keys(current).filter( function(d) { return d.match(/^\d/); } );
+
+                // 2) For each year, extract all values
+                //    (based on the column position; year 1960 has the same position across the dataset)
+                //
+                years.forEach(function(d,i) {
+                  if ( ! previous[i] )        { previous[i] = [] };
+
+                  previous[i].push(parseFloat(current[d]))
+                });
+
+                return previous;
+              }, [])
+
+              .reduce(function(previous, current, index) {
+                // 3) Compute mean for each year
+                //
+                var mean = d3.mean(current);
+                previous.push(mean)
+                return previous;
+              }, [])
+
+              // 4) Remove null values
+              //
+              .filter(function(d) { return d; });
+
+              // 5) Duplicate last value for proper line display
+              //
+              means.push(d3.last(means));
+
+              // Log the values to console
+              //
+              console.log("Mean values:", means);
+
+            // Draw line based on means
+            //
+            var line = chart.selectAll("g.mean").data([means])
+            line
+              .enter()
+               .append("g")
+               .classed("mean", true)
+               .append("path")
+               .attr("opacity", 0)
+              .transition()
+                .delay(500)
+                .duration(500)
+               .attr("opacity", 0.6)
+               .attr("d", d3.svg.line()
+                 .interpolate("step-before")
+                 .x(function(d,i) { return x(i); })
+                 .y(function(d,i) { return config.height - Math.round(y(d)); })
+               );
+          };
+
+          return chart;
+        };
+
+    return {
+      display: display
+    };
+  };
+
+  var chart = new BarChart("life-expectancy-full.csv");
+
+  chart.display(top.location.search.replace(/\?/, "") || "Czech Republic");
+
+</script>
+
+</html>
