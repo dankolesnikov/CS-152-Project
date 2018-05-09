@@ -19,11 +19,11 @@ cd "CS-152-Project"
 	
 # This doesn't get the latest version" sudo apt-get install clojure	
 # Below is the preffered way to install lein	
-wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
-chmod +x lein	
-sudo mv lein /usr/local/bin
+# wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+# chmod +x lein	
+# sudo mv lein /usr/local/bin
 	
-lein -version	
+# lein -version	
 	
 echo "Creating a Hadoop JAR"	
 lein uberjar	
@@ -31,7 +31,7 @@ lein uberjar
 # echo "Downloading CSV files from Google Cloud"
 # echo "CSV files generated from Google Cloud Hadoop cluster reside in hadoop_output folder"
 
-java -jar project-0.1.0-SNAPSHOT-standalone.jar
+# java -jar project-0.1.0-SNAPSHOT-standalone.jar
 
 echo "Opening results of project"
 xdg-open "csv_output"
