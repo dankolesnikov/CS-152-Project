@@ -122,8 +122,13 @@
 (defn write
   "Outputs a CSV file for average delay time of all airline in the specific year"
   [year]
-  (println (airline-delay-percentages "2017"))
+  (with-open [out-file (clojure.java.io/writer (str "csv_output/percentage_delayed_flights_" (Vector->String year) ".csv"))]
+              (clojure.data.csv/write-csv out-file 
+              (cons ["Carrier" "Percentage of Delayed Flights"]
+              (airline-delay-percentages year))
+              :quote \-))
   )
+
 
 (defn write-all
   []
