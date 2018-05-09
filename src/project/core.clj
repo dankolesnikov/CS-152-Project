@@ -142,9 +142,9 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write "2017");
-  ;(write-all)
-  ; (write-all)
+  ;comment in the line below and comment out (write-all) to do a test on 1 year's worth of data
+  ;(write "2017");
+  (write-all)
   (println "DONE!")
   )
 
