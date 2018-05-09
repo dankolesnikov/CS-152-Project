@@ -5,6 +5,10 @@
 
 ## Build 
 Linux: 
+Ensure system has Hadoop and can run as a single-node cluster:
+https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html.
+
+After, build script should work perfectly fine using the following lines:
 
 ```
 chmod +x build.sh
@@ -23,13 +27,12 @@ chmod +x build.sh
 * Determine whether it is a suitabe language for the problems that the chosen framework tackles. 
 
 ### Description 
-Compare a datasets of flight data over 4 years. Analyze the data by finding the top 5 airline carriers that had the biggest delay times in 2004 and compare it to the performance in 2005, 2006, 2007, 2008. See if those airlines have improved. 
+Compare a datasets of flight data over 6 years. Analyze the data by finding the airline carriers that had the biggest delay times in 2012 and compare it to the performance in 2013, 2014, 2015, 2016, 2017. Use Hadoop through Cascalog to reduce the large dataset to a more comprehensible set of 5 csvs seperated by year for data visualization.
 
 Metrics we are looking at:
 
-* Average delay Time
-* Average Number of bounced flights
-* Response to increased load during holiday flights i.e Summer and Winter Break
+* Total Number of Flights
+* Total Number of Delayed Flights over 15 minutes
 * Average Delay
 
 ### Dataset Link
