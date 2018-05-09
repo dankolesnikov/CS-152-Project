@@ -6,7 +6,7 @@
 ## Build 
 Linux: 
 Ensure system has Hadoop and can run as a single-node cluster:
-http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.
+https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html.
 
 After, build script should work perfectly fine using the following lines:
 
