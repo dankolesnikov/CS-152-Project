@@ -38,3 +38,9 @@ Metrics we are looking at:
 ### Dataset Link
 
 [Flight Data](http://stat-computing.org/dataexpo/2009/the-data.html)
+
+## Add-on
+
+* Write Python script to compare performance of each airline
+* Plot with bar charts
+* Use Jupyter Notebook

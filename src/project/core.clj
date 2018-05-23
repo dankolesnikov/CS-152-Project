@@ -8,7 +8,6 @@
 (use 'cascalog.playground) (bootstrap)
 
 ; csv data file
-;(def flight-data (hfs-textline "https://storage.googleapis.com/cs152project/airline_delay_causes_2012_2017.csv"))
 (def flight-data (hfs-textline "resources/airline_delay_causes_2012_2017.csv"))
 (defn flight-parser 
   "parses csv file"
@@ -142,8 +141,6 @@
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  ;comment in the line below and comment out (write-all) to do a test on 1 year's worth of data
-  ;(write "2017");
   (write-all)
   (println "DONE!")
   )
