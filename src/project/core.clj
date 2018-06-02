@@ -9,19 +9,26 @@
 
 ; csv data file
 (def flight-data (hfs-textline "resources/airline_delay_causes_2012_2017.csv"))
+
 (defn flight-parser 
-  "parses csv file"
+  "Pparses csv file"
   [line]
   (map #(.trim %) (first (csv/read-csv line))))
 
 (defn String->Number [str]
-  "convert string to intereger"
+  "Convert a string to an int"
   (let [n (read-string str)]
        (if (number? n) n nil)))
 
-(defn get-names
+; Convert vector to string
+(defn Vector->String [vec] (nth vec 0))  
+
+(defn- parse-strings [^String name]
+  (hfs-textline name))
+
+(defn get-names-all
   [year]
-  "Return a vector of all carrier_names in the csv file"
+  "Return a vector of all carrier names for the specified year"
   (??<- [?carrier_name]
     (flight-data ?line)
     (flight-parser ?line :> ?year ?month ?carrier ?carrier_name ?airport
@@ -32,12 +39,13 @@
                             ?empty)
     (= year ?year)))
 
-(defn get-names-distinct 
+(defn get-names-all-distinct 
+  "Return a vector of unique "
   [year]
-  (distinct (get-names year))
+  (distinct (get-names-all year))
 )
 
-(defn get-years
+(defn get-years-all
   "Return a vector of all years in the csv file"
   []
   (??<- [?year]
@@ -49,15 +57,15 @@
                             ?weather_delay ?nas_delay ?security_delay ?late_aircraft_delay 
                             ?empty)))
 
-(defn get-years-distinct 
+(defn get-years-all-distinct 
   []
-  (distinct (get-years))
+  (distinct (get-years-all))
 )
 
 
 (def years 
   "return distinct years"
-  (distinct get-years))
+  (distinct get-years-all))
 
 ; sum the vectors                       
 (defbufferop dosum [tuples] [(reduce + (map first tuples))])
@@ -84,8 +92,13 @@
 
 
 (defn flights-by-airline
-  "Outputs a vector of carrier name and total flights number for that airline"
   [name year]
+  "
+  Args:
+    name: carrier name
+    year: year of interest 
+  Return:
+    Vector of carrier name and total number of flights took place in the given year"
   (??<- [?carrier_name ?total_flights]
     (flight-data ?line)
     (flight-parser ?line :> ?year _ _ ?carrier_name ?airport
@@ -103,45 +116,73 @@
 ))
 
 (defn delay-percentage-by-airline 
-  "Outputs a a vector of carrier and and average delay time for that airline"
   [name year]
+  "
+  Args: 
+    name: carrier name
+    year: year of interest 
+  Return:
+    Vector of carrier name and percentage of delayed flights that year"
   (??<- [?carrier_name ?average_delay_time] 
   ((flights-by-airline name year) :> ?carrier_name ?flights)
   ((percentage-delay-by-airline name year) :> ?carrier_name ?delay)
   (/ ?delay ?flights :> ?average_delay_time_number)
   (* 100 ?average_delay_time_number :> ?average_delay_time) ; scaling
-  ))
-
-; Convert vector to string
-(defn Vector->String [vec] (nth vec 0))      
+  ))    
 
 ; Returns a vector of vectors [carrier_name average_delay]
-(defn airline-delay-percentages [year] (map Vector->String (map delay-percentage-by-airline (get-names-distinct year) (repeat year))) )
+(defn airline-delay-percentages [year] (map Vector->String (map delay-percentage-by-airline (get-names-all-distinct year) (repeat year))) )
 
-(defn write
-  "Outputs a CSV file for average delay time of all airline in the specific year"
+(defn airline-delay-percentages-by-carrier
+  [name year]
+  "
+  Args: 
+    name: carrier name
+    year: year of interest 
+  Return:
+    Vector of year and percentage of delayed flights that year for the carrier
+  "
+  (println (str (str "Percentage of delays for airline: " name) (str " For Year: " (first year))))
+  (vector (str (first year)) (first (first (??<- [?percentage_delay]
+    ((delay-percentage-by-airline name year) :> _ ?percentage_delay))
+  )))
+)
+
+(defn airline-delay-percentages-by-carrier-all-years
+  [name]
+  (map airline-delay-percentages-by-carrier (repeat name) (get-years-all-distinct))
+)
+
+(defn write-csv-by-airline
+  [name]
+  (with-open [out-file (clojure.java.io/writer (str "results/percentage_delayed_flights_" name ".csv"))]
+              (clojure.data.csv/write-csv out-file
+              (cons ["Year" "Percentage of Delayed Flights"]
+              (airline-delay-percentages-by-carrier-all-years name))
+              :quote \-)
+  )
+)
+
+(defn write-csv-by-year
+  "Create a CSV file for average delay time of all airline in the specific year"
   [year]
-  (with-open [out-file (clojure.java.io/writer (str "csv_output/percentage_delayed_flights_" (Vector->String year) ".csv"))]
-              (clojure.data.csv/write-csv out-file 
+  (with-open [out-file (clojure.java.io/writer (str "results/percentage_delayed_flights_" (Vector->String year) ".csv"))]
+              (clojure.data.csv/write-csv out-file
               (cons ["Carrier" "Percentage of Delayed Flights"]
-              (airline-delay-percentages year))
+              (airline-delay-percentages (first (first year)))
               :quote \-))
   )
+)
 
-
-(defn write-all
+(defn write-all-by-year
+  "Perform write for all years"
   []
-  (dorun (map #(write %) (get-years-distinct)))
-  )
-
-(defn- parse-strings [^String name]
-  (hfs-textline name))
+  (dorun (map #(write-csv-by-year %) (get-years-all-distinct))))
 
 (defn -main
   []
   (println "Starting ...")
   (println "Writing CSV ...")
-  (write-all)
+  (write-csv-by-airline "American Airlines Inc.")
   (println "DONE!")
-  )
-
+)
