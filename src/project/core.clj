@@ -40,7 +40,7 @@
     (= year ?year)))
 
 (defn get-names-all-distinct 
-  "Return a vector of unique "
+  "Return a vector of unique airline names"
   [year]
   (distinct (get-names-all year))
 )
@@ -61,7 +61,6 @@
   []
   (distinct (get-years-all))
 )
-
 
 (def years 
   "return distinct years"
@@ -115,7 +114,7 @@
   (dosum ?arr_flights_num :> ?total_flights) ; sum of all delay times
 ))
 
-(defn delay-percentage-by-airline 
+(defn get-percentage-delay-by-year 
   [name year]
   "
   Args: 
@@ -130,10 +129,7 @@
   (* 100 ?average_delay_time_number :> ?average_delay_time) ; scaling
   ))    
 
-; Returns a vector of vectors [carrier_name average_delay]
-(defn airline-delay-percentages [year] (map Vector->String (map delay-percentage-by-airline (get-names-all-distinct year) (repeat year))) )
-
-(defn airline-delay-percentages-by-carrier
+(defn get-percentage-delay-by-carrier
   [name year]
   "
   Args: 
@@ -144,27 +140,32 @@
   "
   (println (str (str "Percentage of delays for airline: " name) (str " For Year: " (first year))))
   (vector (str (first year)) (first (first (??<- [?percentage_delay]
-    ((delay-percentage-by-airline name year) :> _ ?percentage_delay))
+    ((get-percentage-delay-by-year name year) :> _ ?percentage_delay))
   )))
 )
 
-(defn airline-delay-percentages-by-carrier-all-years
+(defn get-percentage-delay-by-carrier-all-years
   [name]
-  (map airline-delay-percentages-by-carrier (repeat name) (get-years-all-distinct))
+  (map get-percentage-delay-by-carrier (repeat name) (get-years-all-distinct))
 )
+; Returns a vector of vectors [carrier_name average_delay]
+(defn airline-delay-percentages [year]
+ (map Vector->String (map get-percentage-delay-by-year (get-names-all-distinct year) (repeat year))) 
+)
+
 
 (defn write-csv-by-airline
   [name]
   (with-open [out-file (clojure.java.io/writer (str "results/percentage_delayed_flights_" name ".csv"))]
               (clojure.data.csv/write-csv out-file
               (cons ["Year" "Percentage of Delayed Flights"]
-              (airline-delay-percentages-by-carrier-all-years name))
+              (get-percentage-delay-by-carrier-all-years name))
               :quote \-)
   )
 )
 
 (defn write-csv-by-year
-  "Create a CSV file for average delay time of all airline in the specific year"
+  "Create a CSV file for percentage delay times of all airline in the specific year"
   [year]
   (with-open [out-file (clojure.java.io/writer (str "results/percentage_delayed_flights_" (Vector->String year) ".csv"))]
               (clojure.data.csv/write-csv out-file
@@ -178,6 +179,11 @@
   "Perform write for all years"
   []
   (dorun (map #(write-csv-by-year %) (get-years-all-distinct))))
+
+(defn write-all-by-carrier
+  "Perform write for all years"
+  []
+  (dorun (map #(write-csv-by-airline %) (get-names-all-distinct))))
 
 (defn -main
   []
